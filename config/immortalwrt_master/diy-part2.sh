@@ -52,3 +52,15 @@ git clone -b main https://github.com/ophub/luci-app-amlogic.git package/luci-app
 # git apply ../config/patches/{0001*,0002*}.patch --directory=feeds/luci
 #
 # ------------------------------- Additional customizations ends -------------------------------
+#
+# Remove the stale upstream firewall4 fullcone NAT patch.
+# The patch lives in the upstream immortalwrt source
+# (package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch),
+# not in this fork, and it no longer applies to firewall4 2026.11.08
+# (Hunk #1 FAILED at line 5 of root/etc/config/firewall).
+# Fullcone NAT is not needed; standard NAT is used instead.
+# Deleting it here, before compilation, stops the build system applying it.
+rm -f package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch
+# Disable the fullcone kernel module in the build configuration as well.
+sed -i '/CONFIG_PACKAGE_kmod-nft-fullcone/d' .config
+echo '# CONFIG_PACKAGE_kmod-nft-fullcone is not set' >> .config
