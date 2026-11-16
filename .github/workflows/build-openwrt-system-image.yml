@@ -7,12 +7,14 @@ name: Build OpenWrt system image
 
 on:
   repository_dispatch:
+  schedule:
+    - cron: '0 4 * * 5'
   workflow_dispatch:
     inputs:
       source_branch:
         description: "Select the source branch"
         required: false
-        default: "all"
+        default: "immortalwrt_master"
         type: choice
         options:
           - all
@@ -22,7 +24,7 @@ on:
       openwrt_board:
         description: "Select device board"
         required: false
-        default: "all"
+        default: "s905d"
         type: choice
         options:
           - all
@@ -282,7 +284,7 @@ on:
       openwrt_kernel:
         description: "Select kernel version"
         required: false
-        default: "6.12.y_6.18.y"
+        default: "6.12.y"
         type: choice
         options:
           - 5.10.y
