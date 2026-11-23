@@ -7,8 +7,7 @@ name: Build OpenWrt system image
 
 on:
   repository_dispatch:
-  schedule:
-    - cron: '0 4 * * 5'
+  # schedule removed 2026-11-23: GitHub schedule never fired here; the status hub dispatches this (workflow_dispatch)
   workflow_dispatch:
     inputs:
       source_branch:
