@@ -595,19 +595,17 @@ jobs:
           make_latest: true
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ### OpenWrt Image Information
-            - Default IP: `192.168.1.1`
-            - Default username: `root`
-            - Default password: `password`
-            - Default WIFI name: `OpenWrt`
-            - Default WIFI password: `none`
-            ### Install to EMMC
-            - Login to OpenWrt → `System` → `Amlogic Service` → `Install OpenWrt`
-            ### OpenWrt source code
-            - [${{ env.REPO_NAME }}](${{ env.REPO_URL }}/tree/${{ env.REPO_BRANCH }})
-            ### Applicable Platform
-            - 🐧 `arm64`
-            - 🐋 Docker image: https://hub.docker.com/u/ophub
+            ### Image
+            - Board: `s905d` (Phicomm N1)
+            - Source: ImmortalWrt master
+            - Kernel: 6.12.y
+            - Default IP: `10.0.0.1`
+            - Username: `root`
+            - Password: none
+            ### Packages
+            HomeProxy (sing-box), podman, cloudflared, udpxy, msd_lite, luci-app-amlogic, diskman, ttyd, dnsmasq-full
+            ### Install to eMMC
+            - System → Amlogic Service → Install OpenWrt
 
       # Muse 2026-11-23: report build result to the user's status hub (encrypted, AES-256-GCM, repo secret RK_GH).
       # Never fails the build; skipped silently when the secret is missing.
