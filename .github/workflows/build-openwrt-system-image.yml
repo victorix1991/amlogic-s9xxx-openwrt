@@ -608,17 +608,18 @@ jobs:
             - System → Amlogic Service → Install OpenWrt
 
       # Muse 2026-11-23: report build result to the user's status hub (encrypted, AES-256-GCM, repo secret RK_GH).
+      # 2026-11-28: 与 bak / m 共用同一份 .github/muse/hub_report.js（SRC 默认 gh），不再在这里内联一份加密逻辑。
       # Never fails the build; skipped silently when the secret is missing.
       - name: Report result to status hub
         if: ${{ always() }}
         continue-on-error: true
         env:
-          RK_GH: ${{ secrets.RK_GH }}
+          RK: ${{ secrets.RK_GH }}
           JOB_STATUS: ${{ job.status }}
           PKG: ${{ env.PACKAGED_STATUS }}
           BR: ${{ matrix.branch }}
           TAG: ${{ env.build_tag }}
         run: |
-          [ -n "$RK_GH" ] || exit 0
-          node -e 'const c=require("crypto");const e=process.env;const k=Buffer.from(e.RK_GH,"base64");const ts=Math.floor(Date.now()/1000);const n=c.randomBytes(16).toString("hex");const iv=c.randomBytes(12);const ok=e.JOB_STATUS==="success"&&e.PKG==="success";const pt=JSON.stringify({kind:"job",job:"n1-build",result:ok?"ok":"fail",note:((e.BR||"")+" "+(e.JOB_STATUS||"")+" pkg="+(e.PKG||"-")+" "+(e.TAG||"")).slice(0,200)});const ci=c.createCipheriv("aes-256-gcm",k,iv);ci.setAAD(Buffer.from("gh|"+ts+"|"+n));const ct=Buffer.concat([ci.update(pt),ci.final(),ci.getAuthTag()]);process.stdout.write(JSON.stringify({src:"gh",ts:ts,nonce:n,iv:iv.toString("base64"),ct:ct.toString("base64")}));' \
-            | curl -s -m 10 -o /dev/null -w "hub %{http_code}\n" -X POST -H "content-type: application/json" --data-binary @- https://status.xlat.kdns.fr/api/report || true
+          [ -n "$RK" ] || exit 0
+          R=ok; [ "$JOB_STATUS" = success ] && [ "$PKG" = success ] || R=fail
+          node .github/muse/hub_report.js n1-build "$R" "${BR:-} ${JOB_STATUS:-} pkg=${PKG:--} ${TAG:-}"
