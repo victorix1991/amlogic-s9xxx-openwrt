@@ -500,6 +500,8 @@ jobs:
         run: |
           cd openwrt/
           make defconfig
+          # Muse 2026-11-28: package-set gate (msd_lite in; udpxy, Wi-Fi stack out). Fails before the long compile.
+          bash ${{ github.workspace }}/.github/muse/n1_check.sh config .config
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
@@ -553,6 +555,8 @@ jobs:
           cp -f bin/targets/*/*/*-generic-rootfs.tar.gz output/
           cp -f .config output/config
           ls -A | grep -vE '^(output|\.ccache)$' | xargs rm -rf || true
+          # Muse 2026-11-28: verify the built rootfs itself; on failure nothing is packaged or uploaded.
+          bash ${{ github.workspace }}/.github/muse/n1_check.sh rootfs output/*-generic-rootfs.tar.gz || exit 1
 
           # Export build metadata
           df -hT ${PWD}
@@ -603,7 +607,7 @@ jobs:
             - Username: `root`
             - Password: none
             ### Packages
-            HomeProxy (sing-box), podman, cloudflared, udpxy, msd_lite, luci-app-amlogic, diskman, ttyd, dnsmasq-full
+            HomeProxy (sing-box), podman, cloudflared, msd_lite, luci-app-amlogic, diskman, ttyd, dnsmasq-full
             ### Install to eMMC
             - System → Amlogic Service → Install OpenWrt
 
@@ -622,4 +626,4 @@ jobs:
         run: |
           [ -n "$RK" ] || exit 0
           R=ok; [ "$JOB_STATUS" = success ] && [ "$PKG" = success ] || R=fail
-          node .github/muse/hub_report.js n1-build "$R" "${BR:-} ${JOB_STATUS:-} pkg=${PKG:--} ${TAG:-}"
+          node .github/muse/hub_report.js n1-build "$R" "${BR:-} ${JOB_STATUS:-} pkg=${PKG:--} ${TAG:-} ${N1CHECK:-check-not-run}"
