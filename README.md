@@ -10,6 +10,6 @@ Fork of [ophub/amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-ope
 | Default IP | 10.0.0.1 |
 | Login | root, no password |
 
-Packages: HomeProxy (sing-box), podman, cloudflared, udpxy, msd_lite, luci-app-amlogic, diskman, ttyd, dnsmasq-full.
+Packages: HomeProxy (sing-box), podman, cloudflared, msd_lite, luci-app-amlogic, diskman, ttyd, dnsmasq-full.
 
 Build: run **Build OpenWrt system image** in Actions with default inputs. Images are published in Releases.
